@@ -1,0 +1,92 @@
+{
+    "error": {
+        "common": "Đã xảy ra lỗi trong quá trình thực hiện",
+        "required": "Trường này không được để trống",
+        "passwordLength": "Sử dụng mật khẩu có độ dài từ 12 ký tự trở lên",
+        "passwordNotSame": "Mật khẩu không giống nhau",
+        "passwordUpperCase": "Mật khẩu phải chứa ít nhất một chữ cái viết hoa",
+        "passwordLowerCase": "Mật khẩu phải chứa ít nhất một chữ cái thường",
+        "passwordNumber": "Mật khẩu phải chứa ít nhất một chữ số",
+        "passwordSpecial": "Mật khẩu phải chứa ít nhất một ký tự đặc biệt",
+        "email": "Email không hợp lệ",
+        "number": "Trường này phải là số",
+        "min_0": "Giá trị nhỏ nhất là 0",
+        "greaterThan_0": "Giá trị phải lớn hơn 0",
+        "min_1": "Giá trị nhỏ nhất là 1",
+        "max_99": "Giá trị lớn nhất là 99",
+        "chooseImage": "Tệp không hợp lệ, vui lòng chọn tệp hình ảnh khác"
+    },
+    "success": {
+        "update": "Cập nhật thành công",
+        "delete": "Xóa thành công"
+    },
+    "constants": {
+        "pending": "Khoá",
+        "active": "Hoạt động",
+        "male": "Nam",
+        "female": "Nữ",
+        "other": "Khác",
+        "yes": "Có",
+        "no": "Không",
+        "workflowType1": "Riêng tư",
+        "workflowType2": "Chỉnh sửa",
+        "workflowType3": "Xuất bản",
+        "vi": "Tiếng Việt",
+        "en": "Tiếng Anh",
+        "cn": "Tiếng Trung",
+        "category": "Chuyên mục",
+        "article": "Bài viết"
+    },
+    "confirm": {
+        "delete": "Bạn có thực sự muốn xóa đối tượng này không?",
+        "status": "Do you really want change status to {{data}}?"
+    },
+    "admin": {
+        "single": "Quản trị viên",
+        "multiple": "Quản trị viên",
+        "add": "Thêm quản trị viên",
+        "edit": "Cập nhật quản trị viên"
+    },
+    "contributor": {
+        "multiple": "Cộng tác viên",
+        "single": "Cộng tác viên",
+        "add": "Thêm cộng tác viên",
+        "edit": "Cập nhật cộng tác viên"
+    },
+    "group": {
+        "single": "Vai trò",
+        "multiple": "Vai trò",
+        "add": "Thêm vai trò",
+        "edit": "Cập nhật vai trò"
+    },
+    "topic": {
+        "single": "Chủ đề sự kiện",
+        "multiple": "Chủ đề sự kiện",
+        "add": "Thêm chủ đề sự kiện",
+        "edit": "Cập nhật chủ đề sự kiện"
+    },
+    "category": {
+        "single": "Chuyên mục",
+        "multiple": "Chuyên mục {{data}}",
+        "add": "Thêm chuyên mục",
+        "edit": "Cập nhật chuyên mục"
+    },
+    "electronic": {
+        "single": "Báo điện tử",
+        "multiple": "Báo điện tử",
+        "add": "Thêm báo điện tử",
+        "edit": "Cập nhật báo điện tử"
+    },
+    "paper": {
+        "single": "Báo in",
+        "multiple": "Báo in",
+        "add": "Thêm báo in",
+        "edit": "Cập nhật báo in"
+    },
+    "television": {
+        "single": "Chương trình truyền hình",
+        "multiple": "Chương trình truyền hình",
+        "add": "Thêm chương trình truyền hình",
+        "edit": "Cập nhật chương trình truyền hình"
+    }
+}
