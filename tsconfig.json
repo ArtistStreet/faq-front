@@ -24,6 +24,7 @@
       "services/*": ["src/services/*"],
       "hooks/*": ["src/hooks/*"],
       "utils/*": ["src/utils/*"],
+      "languages/*": ["src/languages/*"],
       "assets/*": ["src/assets/*"]
     },
 

@@ -1,5 +1,5 @@
-import Faq from 'types/Faq';
-import { Trash2 } from 'react-feather';
+import Category from 'types/Category';
+import { Edit, Trash2 } from 'react-feather';
 import { Link, useLocation } from 'react-router-dom';
 import Role from '@/types/Role';
 // import { Paging } from '../../../types/common';
@@ -9,47 +9,48 @@ import { SelectOption } from '@/types/common/Item';
 import { useState } from 'react';
 
 interface IProps {
-     items: Faq[];
-     role: Role[];
+     items: Category[];
+     page: number;
+     limit: number;
      // paging: Paging;
-     handleUpdate?: (id: number) => void;
+     handleUpdate: (category: Category) => void;
      handleDelete: (id: number) => void;
-     handleClickFaq?: (id: number) => void;
 }
 
-export default function ListFAQ({
+export default function ListCategory({
      items,
-     role,
+     page,
+     limit,
      handleUpdate,
      handleDelete,
-     handleClickFaq,
-     // showParentInfo = false,
-     // parentName
 }: Readonly<IProps>) {
      return (
           <div className="table-responsive">
-               {/* {showParentInfo && parentName && (
-                    <div className="alert alert-info mb-4">
-                         Đang xem nhóm con của: <strong>{parentName}</strong>
-                    </div>
-               )} */}
                <div className="table-responsive">
                     <table className="table">
                          <thead>
                               <tr>
                                    <th className="text-center">STT</th>
-                                   <th>Câu hỏi</th>
-                                   <th>Câu trả lời</th>
+                                   <th>Ten</th>
+                                   <th>Mo ta</th>
                                    <th className="thAction1"></th>
                               </tr>
                          </thead>
                          <tbody>
-                              {items.map((item: Faq) => (
+                              {items.map((item: Category, index: number) => (
                                    <tr key={item.id}>
-                                        <td className="text-center">{item.question}</td>
-                                        <td className="text-center">{item.question}</td>
-                                        <td className="text-center">{item.answer}</td>
+                                        <td className="text-center">{(page - 1) * limit + index + 1}</td>
+                                        <td className="text-center">{item.name}</td>
+                                        <td className="text-center">{item.description}</td>
                                         <td className="text-center">
+                                             <button
+                                                  type="button"
+                                                  title="Xoá"
+                                                  className="btn btn-icon btn-sm btn-flat-danger waves-effect"
+                                                  onClick={() => handleUpdate(item)}
+                                             >
+                                                  <Edit size={14} />
+                                             </button>
                                              <button
                                                   type="button"
                                                   title="Xoá"

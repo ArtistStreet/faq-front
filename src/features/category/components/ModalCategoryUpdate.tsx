@@ -4,21 +4,21 @@ import UpdateButton from 'components/partials/UpdateButton';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import Group from 'types/Group';
+import Category from 'types/Category';
 import { toggleModalOpen } from 'utils/common';
 import * as yup from 'yup';
-import Select, { MultiValue, SingleValue } from 'react-select';
-import { Role, RoleName, SelectOption } from '@/types/common/Item';
+import Select, { MultiValue } from 'react-select';
+import { SelectOption } from '@/types/common/Item';
 
 interface IProps {
      show: boolean;
-     group: Group | null;
+     category: Category | null;
      isLoading?: boolean;
      changeShow: (s: boolean) => void;
-     submitAction: (data: Group) => void;
+     submitAction: (data: Category) => void;
 }
 
-export default function ModalGroupUpdate({ show, group, isLoading, changeShow, submitAction }: Readonly<IProps>) {
+export default function ModalCategoryUpdate({ show, category, isLoading, changeShow, submitAction }: Readonly<IProps>) {
      const { t } = useTranslation();
      useLayoutEffect(() => toggleModalOpen(show), [show]);
      const [roleValue, setRoleValue] = useState<SelectOption[]>([]);
@@ -26,9 +26,6 @@ export default function ModalGroupUpdate({ show, group, isLoading, changeShow, s
      const schema = yup
           .object({
                name: yup.string().required(t('error.required')).trim(),
-               role: yup.number() // phải là số
-                    .required(t('error.required'))
-               // description: yup.string().required(t('error.required')).trim(),
           })
           .required();
 
@@ -38,51 +35,30 @@ export default function ModalGroupUpdate({ show, group, isLoading, changeShow, s
           reset,
           setValue,
           formState: { errors },
-     } = useForm<Group>({
-          defaultValues: {
-               role: Role.MANAGER,
-          },
+     } = useForm<Category>({
           resolver: yupResolver(schema),
      });
 
      useEffect(() => {
-          if (group && show) {
+          if (category && show) {
                reset({
-                    name: group.name ?? '',
-                    description: group.description ?? '',
-                    role: group.role ?? undefined,
+                    name: category.name ?? '',
+                    description: category.description ?? '',
                });
-               setRoleValue(
-                    group.role !== undefined
-                         ? [
-                              {
-                                   value: group.role,
-                                   label:
-                                        RoleName.find((item) => item.id === group.role)?.name ||
-                                        '',
-                              },
-                         ]
-                         : []
-               );
+               // setRoleValue(
+               //      (category.category ?? []).map((id) => {
+               //           const matched = role.find((r) => r.id === id);
+               //           return { value: id, label: matched ? matched.name : String(id) };
+               //      })
+               // );
           } else {
                reset({
                     name: '',
                     description: '',
-                    role: undefined,
                });
                setRoleValue([]);
           }
-     }, [group, show, reset]);
-
-     const onChangeRole = (value: SingleValue<SelectOption>) => {
-          if (value) {
-               setRoleValue([value]);
-               setValue('role', (value.value));
-          } else {
-               setRoleValue([]);
-               setValue('role', 1);
-          }
-     };
+     }, [category, show, reset]);
 
      return (
           <>
@@ -94,7 +70,7 @@ export default function ModalGroupUpdate({ show, group, isLoading, changeShow, s
                          <div className="modal-content">
                               <div className="modal-header">
                                    <h5 className="modal-title">
-                                        {group ? 'Cập nhật cấu hình' : 'Thêm mới cấu hình'}
+                                        {category ? 'Cập nhật cấu hình' : 'Thêm mới cấu hình'}
                                    </h5>
                                    <button
                                         type="button"
@@ -109,24 +85,7 @@ export default function ModalGroupUpdate({ show, group, isLoading, changeShow, s
                                         <div className="row">
                                              <div className="col-12 col-sm-6 mb-3">
                                                   <label className="form-label">
-                                                       Loai <span className="text-danger">*</span>
-                                                  </label>
-                                                  <Select
-                                                       options={RoleName.map((item) => ({
-                                                            value: item.id,
-                                                            label: item.name,
-                                                       }))}
-                                                       isMulti={false}
-                                                       onChange={onChangeRole}
-                                                       value={roleValue}
-                                                       isClearable={false}
-                                                       placeholder="Chọn..."
-                                                  />
-                                                  {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
-                                             </div>
-                                             <div className="col-12 col-sm-6 mb-3">
-                                                  <label className="form-label">
-                                                       ten <span className="text-danger">*</span>
+                                                       Ten <span className="text-danger">*</span>
                                                   </label>
                                                   <input
                                                        {...register('name')}
@@ -139,7 +98,7 @@ export default function ModalGroupUpdate({ show, group, isLoading, changeShow, s
 
                                              <div className="col-12 mb-3">
                                                   <label className="form-label">
-                                                       mo ta <span className="text-danger">*</span>
+                                                       Mo ta <span className="text-danger">*</span>
                                                   </label>
                                                   <textarea
                                                        {...register('description')}

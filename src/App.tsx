@@ -1,8 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import './App.css'
-import GroupList from './features/group/pages/GroupList'
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import RoleList from './features/role/pages/RoleList';
+import RouterView from './routes';
 
 const queryClient = new QueryClient({
      defaultOptions: {
@@ -18,13 +16,7 @@ function App() {
      return (
           <>
                <QueryClientProvider client={queryClient}>
-                    <BrowserRouter>
-                         <Routes>
-                              <Route path="/groups" element={<GroupList />} />
-                              <Route path="/groups/*" element={<GroupList />} /> /* để bắt nested
-                              <Route path="/roles" element={<RoleList />} />
-                         </Routes>
-                    </BrowserRouter>
+                    <RouterView />
                </QueryClientProvider>
           </>
      )

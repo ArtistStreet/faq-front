@@ -1,37 +1,31 @@
-import Group from 'types/Group';
-import { Trash2, Edit } from 'react-feather';
+import Faq from 'types/Faq';
+import { Edit, Trash2 } from 'react-feather';
 import { Link, useLocation } from 'react-router-dom';
 import Role from '@/types/Role';
 // import { Paging } from '../../../types/common';
 // import { genTableIndex } from '../../../utils/common';
 import Select, { MultiValue } from 'react-select';
-import { RoleName, SelectOption } from '@/types/common/Item';
+import { SelectOption } from '@/types/common/Item';
 import { useState } from 'react';
+import Category from '@/types/Category';
 
 interface IProps {
-     items: Group[];
-     // paging: Paging;
+     items: Faq[];
      page: number;
+     category: Category[] | undefined;
      limit: number;
-     handleUpdate: (group: Group) => void;
+     handleUpdate: (faq: Faq) => void;
      handleDelete: (id: number) => void;
-     onToggle: (group: Group) => void;
 }
 
-export default function ListGroup({
+export default function ListFAQ({
      items,
-     handleUpdate,
-     handleDelete,
+     category,
      page,
      limit,
-     onToggle
+     handleUpdate,
+     handleDelete,
 }: Readonly<IProps>) {
-     const getRoleBadge = (roleId?: number) => {
-          const role = RoleName.find(r => r.id === roleId);
-          if (!role) return <span className="text-muted">—</span>;
-          return <span className={role.className}>{role.name}</span>;
-     };
-
      return (
           <div className="table-responsive">
                <div className="table-responsive">
@@ -39,29 +33,19 @@ export default function ListGroup({
                          <thead>
                               <tr>
                                    <th className="text-center">STT</th>
-                                   <th>Vai trò</th>
-                                   <th>Tên</th>
-                                   <th>Mô tả</th>
+                                   <th>Loại câu hỏi</th>
+                                   <th>Câu hỏi</th>
+                                   <th>Câu trả lời</th>
                                    <th className="thAction1"></th>
                               </tr>
                          </thead>
                          <tbody>
-                              {items.map((item: Group, index: number) => (
+                              {items.map((item: Faq, index: number) => (
                                    <tr key={item.id}>
                                         <td className="text-center">{(page - 1) * limit + index + 1}</td>
-                                        <td>
-                                             {getRoleBadge(item.role)}
-                                        </td>
-                                        <td>
-                                             <span className="text-primary cursor-pointer" role='button'>
-                                                  {item.name} {item.hasChildren && (
-                                                       <button onClick={() => onToggle(item)}>
-                                                            {item.isOpen ? '▼' : '▶'}
-                                                       </button>
-                                                  )}
-                                             </span>
-                                        </td>
-                                        <td>{item.description}</td>
+                                        <td className="text-center">{item.category?.map(cat => cat.name).join(', ') || '-'}</td>
+                                        <td className="text-center">{item.question}</td>
+                                        <td className="text-center">{item.answer}</td>
                                         <td className="text-center">
                                              <button
                                                   type="button"

@@ -1,8 +1,11 @@
 import { TFunction } from 'i18next';
 import { find, get, isEmpty } from 'lodash';
 import { toast, ToastOptions } from 'react-toastify';
-import { ItemParam, SelectOption } from 'types/common/Item';
+import { ItemParam, ItemParamModel, SelectOption } from 'types/common/Item';
 import { DataList, Paging } from '../types/common';
+// import { COMMON_MESSAGE } from '../constants/common';
+// import Article, { ArticlePageType } from '../types/Article';
+import User, { UserRole } from '../types/User';
 import { JSX } from 'react';
 
 export const showToast = (success: boolean, messages?: string[]) => {
@@ -113,6 +116,11 @@ export const getSelectStyle = (baseStyles: any, state: any, isError: boolean) =>
      boxShadow: 'none',
 });
 
+export const refreshPage = () =>
+     setTimeout(() => {
+          window.location.reload();
+     }, 2000);
+
 export const isValidImageFile = (file: File) => {
      const validImageTypes = [
           'image/png',
@@ -126,26 +134,46 @@ export const isValidImageFile = (file: File) => {
      return file && validImageTypes.includes(file.type);
 };
 
+/**
+ * Normalize Vietnamese text for search filtering
+ * Converts to lowercase and removes diacritics/accents
+ * @param text Text to normalize
+ * @returns Normalized text
+ */
+export const normalizeVietnameseText = (text: string): string => {
+     if (!text) return '';
+
+     return text
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+          .replace(/đ/g, 'd')
+          .replace(/Đ/g, 'd');
+};
+
 /* tslint:disable:no-any */
 export function flattenObject(obj: any, prefix = ''): Record<string, any> {
-     return Object.keys(obj).reduce((acc, k) => {
-          const pre = prefix.length ? prefix + '.' : '';
-          if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
-               Object.assign(acc, flattenObject(obj[k], pre + k));
-          } else {
-               acc[pre + k] = obj[k];
-          }
-          return acc;
-     }, {} as Record<string, any>);
+     return Object.keys(obj).reduce(
+          (acc, k) => {
+               const pre = prefix.length ? prefix + '.' : '';
+               if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+                    Object.assign(acc, flattenObject(obj[k], pre + k));
+               } else {
+                    acc[pre + k] = obj[k];
+               }
+               return acc;
+          },
+          {} as Record<string, any>
+     );
 }
 
 export const convertPaging = <T, K extends { page?: string; limit?: string }>(
-     data: DataList<T>,
+     data: DataList<T> | undefined,
      limit: number
 ): Paging => ({
-     count_item: data.totalCount,
-     total_page: data.totalPages,
-     current_page: data.currentPage, // Number(paramConfig.page),
+     count_item: data?.totalCount ?? 0,
+     total_page: data?.totalPages ?? 0,
+     current_page: data?.currentPage ?? 1, // Number(paramConfig.page),
      limit,
 });
 
@@ -182,7 +210,7 @@ export const convertDataToSelectOptions = <T extends Record<string, any>>(
      const selectOptions: SelectOption[] = [];
 
      // Thêm tùy chọn mặc định nếu được cung cấp
-     if (defaultOption !== null) {
+     if (defaultOption !== null && defaultOption !== undefined) {
           selectOptions.push(
                defaultOption || {
                     value: 0,
@@ -203,4 +231,98 @@ export const convertDataToSelectOptions = <T extends Record<string, any>>(
      });
 
      return selectOptions;
+};
+
+export const convertObjectToSelectOptions = (items: ItemParamModel[]) =>
+     items.map((item) => ({
+          value: item.id,
+          label: item.name,
+     }));
+
+export const handleGraphQLError = (error: Error): void => {
+     if ('errors' in error && Array.isArray(error.errors)) {
+          const listErrs: string[] = [];
+          error.errors[0].errors.forEach((item: string) => {
+               listErrs.push(item.split(':')[1]);
+          });
+          showToast(false, listErrs);
+          return;
+     } else {
+          // showToast(false, [COMMON_MESSAGE.ERROR_MESSAGE]);
+          return;
+     }
+};
+
+/**
+ * Chuyển đổi mảng phẳng thành cấu trúc phân cấp cha-con đa cấp
+ * @param items Mảng các phần tử cần chuyển đổi
+ * @param parentIdField Tên trường chứa ID của phần tử cha (mặc định: 'parent_id')
+ * @param childrenField Tên trường để lưu các phần tử con (mặc định: 'children')
+ * @param sortField Tên trường để sắp xếp các phần tử (tùy chọn, mặc định: 'display_order')
+ * @returns Mảng các phần tử đã được tổ chức theo cấu trúc phân cấp
+ */
+export function createHierarchy<T extends Record<string, any>>(
+     items: T[],
+     parentIdField: keyof T = 'parent_id' as keyof T,
+     childrenField: string = 'children'
+): T[] {
+     const itemsCopy = [...items];
+
+     const buildHierarchy = (parentId: any = null): T[] => {
+          const children = itemsCopy.filter((item) => {
+               if (parentId === null) {
+                    return !item[parentIdField];
+               }
+               return item[parentIdField] === parentId;
+          });
+
+          if (children.length === 0) {
+               return [];
+          }
+
+          return children.map((child) => {
+               const childWithChildren = { ...child };
+               const nestedChildren = buildHierarchy(child.id);
+
+               //tslint:disable-next-line: no-any
+               (childWithChildren as any)[childrenField] = nestedChildren;
+
+               return childWithChildren;
+          });
+     };
+
+     return buildHierarchy();
+}
+
+// export const getArticlePageType = (article: Article, currentUser: User) => {
+//      if (article.createdByUser?.id === currentUser.id) {
+//           return ArticlePageType.PERSONAL;
+//      }
+//      if (article.createdByUser?.role_id === UserRole.ADMIN) {
+//           return ArticlePageType.REPORTER;
+//      }
+//      if (article.createdByUser?.role_id === UserRole.CONTRIBUTOR) {
+//           return ArticlePageType.COLLABORATOR;
+//      }
+//      return ArticlePageType.PERSONAL;
+// };
+
+// convert url to File object
+export const urlToFile = async (url: string): Promise<File | null> => {
+     try {
+          const response = await fetch(url);
+
+          if (!response.ok) {
+               throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          const blob = await response.blob();
+
+          const filename = url.substring(url.lastIndexOf('/') + 1);
+          const mimeType = blob.type;
+
+          return new File([blob], filename, { type: mimeType });
+     } catch (error) {
+          return null;
+     }
 };

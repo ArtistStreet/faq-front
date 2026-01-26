@@ -4,31 +4,33 @@ import UpdateButton from 'components/partials/UpdateButton';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import Group from 'types/Group';
+import Faq, { FaqFormInput } from 'types/Faq';
 import { toggleModalOpen } from 'utils/common';
 import * as yup from 'yup';
-import Select, { MultiValue, SingleValue } from 'react-select';
-import { Role, RoleName, SelectOption } from '@/types/common/Item';
+import Select, { MultiValue } from 'react-select';
+import { SelectOption } from '@/types/common/Item';
+import Role from '@/types/Role';
+import Category from '@/types/Category';
 
 interface IProps {
      show: boolean;
-     group: Group | null;
+     faq: Faq | null;
+     category: Category[] | undefined;
      isLoading?: boolean;
      changeShow: (s: boolean) => void;
-     submitAction: (data: Group) => void;
+     submitAction: (data: FaqFormInput) => void;
 }
 
-export default function ModalGroupUpdate({ show, group, isLoading, changeShow, submitAction }: Readonly<IProps>) {
+export default function ModalFaqUpdate({ show, faq, category, isLoading, changeShow, submitAction }: Readonly<IProps>) {
      const { t } = useTranslation();
      useLayoutEffect(() => toggleModalOpen(show), [show]);
-     const [roleValue, setRoleValue] = useState<SelectOption[]>([]);
+     const [faqValue, setFaqValue] = useState<SelectOption[]>([]);
 
      const schema = yup
           .object({
-               name: yup.string().required(t('error.required')).trim(),
-               role: yup.number() // phải là số
-                    .required(t('error.required'))
-               // description: yup.string().required(t('error.required')).trim(),
+               answer: yup.string().required(t('error.required')).trim(),
+               question: yup.string().required(t('error.required')).trim(),
+               categoryIds: yup.array().required(t('error.required')).min(1, t('error.required')),
           })
           .required();
 
@@ -38,50 +40,39 @@ export default function ModalGroupUpdate({ show, group, isLoading, changeShow, s
           reset,
           setValue,
           formState: { errors },
-     } = useForm<Group>({
-          defaultValues: {
-               role: Role.MANAGER,
-          },
+     } = useForm<FaqFormInput>({
           resolver: yupResolver(schema),
      });
 
      useEffect(() => {
-          if (group && show) {
+          if (faq && show) {
                reset({
-                    name: group.name ?? '',
-                    description: group.description ?? '',
-                    role: group.role ?? undefined,
+                    answer: faq.answer ?? '',
+                    question: faq.question ?? '',
+                    categoryIds: faq.categoryIds ?? [],
                });
-               setRoleValue(
-                    group.role !== undefined
-                         ? [
-                              {
-                                   value: group.role,
-                                   label:
-                                        RoleName.find((item) => item.id === group.role)?.name ||
-                                        '',
-                              },
-                         ]
-                         : []
+               setFaqValue(
+                    (faq.categoryIds ?? []).map((id) => {
+                         const matched = category?.find((r) => r.id === id);
+                         return { value: id, label: matched ? matched.name : String(id) };
+                    })
                );
           } else {
                reset({
-                    name: '',
-                    description: '',
-                    role: undefined,
+                    answer: '',
+                    question: '',
+                    categoryIds: [],
                });
-               setRoleValue([]);
+               setFaqValue([]);
           }
-     }, [group, show, reset]);
+     }, [faq, show, reset]);
 
-     const onChangeRole = (value: SingleValue<SelectOption>) => {
-          if (value) {
-               setRoleValue([value]);
-               setValue('role', (value.value));
-          } else {
-               setRoleValue([]);
-               setValue('role', 1);
-          }
+     const onChangeRole = (value: MultiValue<SelectOption>) => {
+          setFaqValue([...value]);
+          setValue(
+               'categoryIds',
+               value.map((item) => item.value)
+          );
      };
 
      return (
@@ -94,7 +85,7 @@ export default function ModalGroupUpdate({ show, group, isLoading, changeShow, s
                          <div className="modal-content">
                               <div className="modal-header">
                                    <h5 className="modal-title">
-                                        {group ? 'Cập nhật cấu hình' : 'Thêm mới cấu hình'}
+                                        {faq ? 'Cập nhật cấu hình' : 'Thêm mới cấu hình'}
                                    </h5>
                                    <button
                                         type="button"
@@ -109,45 +100,45 @@ export default function ModalGroupUpdate({ show, group, isLoading, changeShow, s
                                         <div className="row">
                                              <div className="col-12 col-sm-6 mb-3">
                                                   <label className="form-label">
-                                                       Loai <span className="text-danger">*</span>
+                                                       Loại câu hỏi <span className="text-danger">*</span>
                                                   </label>
                                                   <Select
-                                                       options={RoleName.map((item) => ({
-                                                            value: item.id,
+                                                       options={category?.map((item) => ({
+                                                            value: item.id!,
                                                             label: item.name,
                                                        }))}
-                                                       isMulti={false}
+                                                       isMulti={true}
                                                        onChange={onChangeRole}
-                                                       value={roleValue}
-                                                       isClearable={false}
+                                                       value={faqValue}
+                                                       isClearable
                                                        placeholder="Chọn..."
                                                   />
-                                                  {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
+                                                  {errors.categoryIds && <div className="invalid-feedback">{errors.categoryIds.message}</div>}
                                              </div>
                                              <div className="col-12 col-sm-6 mb-3">
                                                   <label className="form-label">
-                                                       ten <span className="text-danger">*</span>
+                                                       Câu hỏi <span className="text-danger">*</span>
                                                   </label>
                                                   <input
-                                                       {...register('name')}
+                                                       {...register('answer')}
                                                        type="text"
-                                                       className={`form-control ${errors.name ? 'is-invalid' : ''}`}
+                                                       className={`form-control ${errors.answer ? 'is-invalid' : ''}`}
                                                        placeholder="Nhập mã"
                                                   />
-                                                  {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
+                                                  {errors.answer && <div className="invalid-feedback">{errors.answer.message}</div>}
                                              </div>
 
                                              <div className="col-12 mb-3">
                                                   <label className="form-label">
-                                                       mo ta <span className="text-danger">*</span>
+                                                       Câu trả lời <span className="text-danger">*</span>
                                                   </label>
                                                   <textarea
-                                                       {...register('description')}
-                                                       className={`form-control ${errors.description ? 'is-invalid' : ''}`}
+                                                       {...register('question')}
+                                                       className={`form-control ${errors.question ? 'is-invalid' : ''}`}
                                                        rows={4}
                                                        placeholder="Nhập nội dung"
                                                   />
-                                                  {errors.description && <div className="invalid-feedback">{errors.description.message}</div>}
+                                                  {errors.question && <div className="invalid-feedback">{errors.question.message}</div>}
                                              </div>
                                         </div>
                                    </div>

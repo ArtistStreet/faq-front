@@ -21,21 +21,16 @@
         "delete": "Xóa thành công"
     },
     "constants": {
-        "pending": "Khoá",
-        "active": "Hoạt động",
-        "male": "Nam",
-        "female": "Nữ",
-        "other": "Khác",
-        "yes": "Có",
-        "no": "Không",
-        "workflowType1": "Riêng tư",
-        "workflowType2": "Chỉnh sửa",
-        "workflowType3": "Xuất bản",
-        "vi": "Tiếng Việt",
-        "en": "Tiếng Anh",
-        "cn": "Tiếng Trung",
-        "category": "Chuyên mục",
-        "article": "Bài viết"
+          "pending": "Khoá",
+          "active": "Hoạt động",
+          "male": "Nam",
+          "female": "Nữ",
+          "other": "Khác",
+          "yes": "Có",
+          "no": "Không",
+          "officer": "officer",
+          "manager": "manager",
+          "president": "president"
     },
     "confirm": {
         "delete": "Bạn có thực sự muốn xóa đối tượng này không?",

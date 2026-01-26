@@ -1,52 +1,48 @@
 import { gql } from '@apollo/client';
 
-export const GROUP_LIST = gql`
-  query GroupList {  
-    groupList {
-      id
-      name
-      description
-      role
-      parent {
-        id
-        name
-      }
-      children {
-        id
-        name
-      }
-    }
-  }
-`;
-
 export const GET_ROOT_GROUPS = gql`
-  query GetRootGroups {
-    rootGroups {
-      id
-      name
-      description
-      hasChildren 
-      roles {
-        id
-        name
-      }
+  query GetRootGroups($page: Int!, $limit: Int!, $filters: [String!], $sort: String, $search: String) {
+    rootGroups(input: { page: $page, limit: $limit, filters: $filters, sort: $sort, search: $search }) {
+     totalCount
+     totalPages
+     currentPage
+     data {
+          id
+          name
+          description
+          hasChildren 
+          role
+     }
     }
   }
 `;
 
 export const GET_GROUP_CHILDREN = gql`
-  query GetGroupChildren($parentId: Int!) {
-    groupChildren(parentId: $parentId) {
+  query GetGroupChildren(
+  $id: Int!,
+  $page: Int!,
+  $limit: Int!,
+  $filters: [String!],
+  $sort: String,
+  $search: String
+) {
+  groupChildren(
+    id: $id,
+    input: { page: $page, limit: $limit, filters: $filters, sort: $sort, search: $search }
+  ) {
+    totalCount
+    totalPages
+    currentPage
+    data {
       id
       name
       description
       hasChildren
-      roles {
-        id
-        name
-      }
+      role
     }
   }
+}
+
 `;
 
 export const GROUP_CREATE = gql`
@@ -56,10 +52,7 @@ export const GROUP_CREATE = gql`
       name
       description
       parent_id
-      roles {
-        id
-        name
-      }
+      role
     }
   }
 `;
@@ -71,10 +64,7 @@ export const GROUP_UPDATE = gql`
       name
       description
       parent_id
-      roles {
-        id
-        name
-      }
+      role
     }
   }
 `;

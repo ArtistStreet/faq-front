@@ -1,8 +1,8 @@
 import { ReactNode, useState } from 'react';
 
 interface TabProps {
-     faq: ReactNode;
-     group: ReactNode;
+     faq?: ReactNode;
+     group?: ReactNode;
 }
 
 export default function Tab({ group, faq }: TabProps) {
@@ -19,7 +19,7 @@ export default function Tab({ group, faq }: TabProps) {
                               type="button"
                               role="tab"
                          >
-                              Quan ly
+                              Quản lý
                          </button>
                     </li>
                     <li className="nav-item" role="presentation">
