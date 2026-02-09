@@ -1,19 +1,27 @@
-import { gql } from 'graphql-request';
+import { gql } from '@apollo/client';
 
 export const LOGIN = gql`
-    mutation Auth_login($body: LoginInputDto!) {
-        auth_login(body: $body) {
-            id
-            full_name
-            avatar
-            role_id
-            created_at
-            token {
-                access_token
-                refresh_token
-            }
+    mutation Login($input: LoginInput!) {
+        login(input: $input) {
+          accessToken
+          user {
+               id
+               email
+               name
+               role
+          }
         }
     }
+`;
+
+export const REGISTER = gql`
+  mutation Register($input: RegisterInput!) {
+    register(input: $input) {
+      id
+      email
+      name
+    }
+  }
 `;
 
 export const PROFILE = gql`
