@@ -9,30 +9,30 @@ import { toggleModalOpen } from 'utils/common';
 import * as yup from 'yup';
 import Select, { MultiValue } from 'react-select';
 import { SelectOption } from '@/types/common/Item';
-import Role from '@/types/Role';
+import Product, { CreateProductInput } from '@/types/Product';
 import Category from '@/types/Category';
 
 interface IProps {
      show: boolean;
-     faq: Faq | null;
-     category: Category[] | undefined;
+     product: Product | null;
+     categoryIds: Category[] | undefined;
      isLoading?: boolean;
      changeShow: (s: boolean) => void;
-     submitAction: (data: FaqFormInput) => void;
+     submitAction: (data: Product) => void;
 }
 
-export default function ModalFaqUpdate({ show, faq, category, isLoading, changeShow, submitAction }: Readonly<IProps>) {
-     const { t } = useTranslation();
+export default function ModalProductUpdate({ show, product, categoryIds, isLoading, changeShow, submitAction }: Readonly<IProps>) {
      useLayoutEffect(() => toggleModalOpen(show), [show]);
-     const [faqValue, setFaqValue] = useState<SelectOption[]>([]);
+     const [value, setCategoryValue] = useState<SelectOption[]>([]);
 
-     const schema = yup
-          .object({
-               answer: yup.string().required(t('error.required')).trim(),
-               question: yup.string().required(t('error.required')).trim(),
-               categoryIds: yup.array().required(t('error.required')).min(1, t('error.required')),
-          })
-          .required();
+     const schema = yup.object({
+          name: yup.string().required().trim(),
+          desc: yup.string().nullable().optional(),
+          price: yup.number().required().positive(),
+          stock: yup.number().required().positive(),
+          categoryIds: yup.array().of(yup.number()).min(1).required(),
+          status: yup.number().optional(),
+     });
 
      const {
           register,
@@ -40,35 +40,40 @@ export default function ModalFaqUpdate({ show, faq, category, isLoading, changeS
           reset,
           setValue,
           formState: { errors },
-     } = useForm<FaqFormInput>({
+     } = useForm<CreateProductInput>({
           resolver: yupResolver(schema),
      });
 
      useEffect(() => {
-          if (faq && show) {
+          if (product && show) {
                reset({
-                    answer: faq.answer ?? '',
-                    question: faq.question ?? '',
-                    categoryIds: faq.categoryIds ?? [],
+                    name: product.name ?? '',
+                    desc: product.desc ?? '',
+                    price: product.price ?? 0,
+                    stock: product.stock ?? 0,
+                    categoryIds: product.categoryIds ?? [],
+                    // status: product.status,
                });
-               setFaqValue(
-                    (faq.categoryIds ?? []).map((id) => {
-                         const matched = category?.find((r) => r.id === id);
-                         return { value: id, label: matched ? matched.name : String(id) };
-                    })
+               setCategoryValue(
+                    (product.category ?? []).map((cat) => ({
+                         value: cat.id!,
+                         label: cat.name,
+                    }))
                );
           } else {
                reset({
-                    answer: '',
-                    question: '',
+                    name: '',
+                    desc: '',
+                    price: 0,
+                    stock: 0,
                     categoryIds: [],
                });
-               setFaqValue([]);
+               setCategoryValue([]);
           }
-     }, [faq, show, reset]);
+     }, [product, show, reset]);
 
      const onChangeRole = (value: MultiValue<SelectOption>) => {
-          setFaqValue([...value]);
+          setCategoryValue([...value]);
           setValue(
                'categoryIds',
                value.map((item) => item.value)
@@ -85,7 +90,7 @@ export default function ModalFaqUpdate({ show, faq, category, isLoading, changeS
                          <div className="modal-content">
                               <div className="modal-header">
                                    <h5 className="modal-title">
-                                        {faq ? 'Cập nhật cấu hình' : 'Thêm mới cấu hình'}
+                                        {product ? 'Cập nhật cấu hình' : 'Thêm mới cấu hình'}
                                    </h5>
                                    <button
                                         type="button"
@@ -100,16 +105,16 @@ export default function ModalFaqUpdate({ show, faq, category, isLoading, changeS
                                         <div className="row">
                                              <div className="col-12 col-sm-6 mb-3">
                                                   <label className="form-label">
-                                                       Loại câu hỏi <span className="text-danger">*</span>
+                                                       danh muc <span className="text-danger">*</span>
                                                   </label>
                                                   <Select
-                                                       options={category?.map((item) => ({
+                                                       options={categoryIds?.map((item) => ({
                                                             value: item.id!,
                                                             label: item.name,
                                                        }))}
                                                        isMulti={true}
                                                        onChange={onChangeRole}
-                                                       value={faqValue}
+                                                       value={value}
                                                        isClearable
                                                        placeholder="Chọn..."
                                                   />
@@ -117,28 +122,53 @@ export default function ModalFaqUpdate({ show, faq, category, isLoading, changeS
                                              </div>
                                              <div className="col-12 col-sm-6 mb-3">
                                                   <label className="form-label">
-                                                       Câu hỏi <span className="text-danger">*</span>
+                                                       ten <span className="text-danger">*</span>
                                                   </label>
                                                   <input
-                                                       {...register('answer')}
+                                                       {...register('name')}
                                                        type="text"
-                                                       className={`form-control ${errors.answer ? 'is-invalid' : ''}`}
+                                                       className={`form-control ${errors.name ? 'is-invalid' : ''}`}
                                                        placeholder="Nhập mã"
                                                   />
-                                                  {errors.answer && <div className="invalid-feedback">{errors.answer.message}</div>}
+                                                  {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
+                                             </div>
+                                             <div className="col-12 col-sm-6 mb-3">
+                                                  <label className="form-label">
+                                                       mo ta <span className="text-danger">*</span>
+                                                  </label>
+                                                  <input
+                                                       {...register('desc')}
+                                                       type="text"
+                                                       className={`form-control ${errors.desc ? 'is-invalid' : ''}`}
+                                                       placeholder="Nhập mô tả"
+                                                  />
+                                                  {errors.desc && <div className="invalid-feedback">{errors.desc.message}</div>}
                                              </div>
 
                                              <div className="col-12 mb-3">
                                                   <label className="form-label">
-                                                       Câu trả lời <span className="text-danger">*</span>
+                                                       gia <span className="text-danger">*</span>
                                                   </label>
                                                   <textarea
-                                                       {...register('question')}
-                                                       className={`form-control ${errors.question ? 'is-invalid' : ''}`}
+                                                       {...register('price')}
+                                                       className={`form-control ${errors.price ? 'is-invalid' : ''}`}
                                                        rows={4}
                                                        placeholder="Nhập nội dung"
                                                   />
-                                                  {errors.question && <div className="invalid-feedback">{errors.question.message}</div>}
+                                                  {errors.price && <div className="invalid-feedback">{errors.price.message}</div>}
+                                             </div>
+
+                                             <div className="col-12 mb-3">
+                                                  <label className="form-label">
+                                                       so luong <span className="text-danger">*</span>
+                                                  </label>
+                                                  <textarea
+                                                       {...register('stock')}
+                                                       className={`form-control ${errors.stock ? 'is-invalid' : ''}`}
+                                                       rows={4}
+                                                       placeholder="Nhập nội dung"
+                                                  />
+                                                  {errors.stock && <div className="invalid-feedback">{errors.stock.message}</div>}
                                              </div>
                                         </div>
                                    </div>

@@ -15,7 +15,6 @@ export interface FaqFormInput {
      categoryIds: number[];
 }
 
-
 export interface FaqQuery {
      faqList: {
           data: Faq[];

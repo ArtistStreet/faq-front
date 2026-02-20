@@ -80,10 +80,10 @@ export default function FaqList() {
           const variables = currentCat?.id
                ? {
                     id: currentCat.id,
-                    input: finalData, // ← Update: gói vào input
+                    input: finalData,
                }
                : {
-                    input: finalData, // ← Create: gói vào input (bắt buộc vì mutation có $input!)
+                    input: finalData,
                };
 
           await saveFaq({ variables });

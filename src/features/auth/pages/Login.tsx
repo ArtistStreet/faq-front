@@ -18,12 +18,12 @@ export default function Login() {
           try {
                const res = await login({ variables: { input: { email, password } } });
 
-               const { accessToken, user } = res.data?.login || {};
-               if (!accessToken || !user) {
+               const { accessToken } = res.data?.login || {};
+               if (!accessToken) {
                     throw new Error("Invalid login response");
                }
                localStorage.setItem('token', accessToken);
-               authLogin(user, accessToken);
+               authLogin(accessToken);
                navigate('/'); // Redirect to home or dashboard
           } catch (err) {
                console.error('Login failed:', err);

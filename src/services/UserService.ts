@@ -25,30 +25,16 @@ export const REGISTER = gql`
 `;
 
 export const PROFILE = gql`
-    query Auth_profile {
-        auth_profile {
-            id
-            user_name
-            full_name
-            phone
-            email
-            address
-            avatar_id
-            gender_id
-            role_id
-            status_id
-            telegram_id
-            birthday
-            email_notify
-            telegram_notify
-            zalo_notify
-            email_verified
-            phone_verified
-            avatar {
-                id
-                file_name
-                file_url
-            }
+    query Me {
+        me {
+               id
+               email
+               name
+               role
+               shop {
+                    id
+                    name
+               }
         }
     }
 `;

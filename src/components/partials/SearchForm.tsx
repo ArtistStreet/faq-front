@@ -77,7 +77,6 @@ export default function SearchForm({ fields, isLoading, searchClass = '', preser
 
      const onSubmit = (data: FieldValues) => {
           const newSearchParams = new URLSearchParams(searchParams);
-          console.log(data);
 
           Object.entries(data).forEach(([key, value]) => {
                if (value) {

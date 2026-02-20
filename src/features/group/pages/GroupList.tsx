@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useQuery, useLazyQuery, useMutation } from '@apollo/client/react';
 import { useEffect, useState } from 'react';
 import { GET_ROOT_GROUPS, GET_GROUP_CHILDREN, GROUP_DELETE, GROUP_CREATE, GROUP_UPDATE } from 'services/GroupServices';
-import { FAQ_CREATE, FAQ_DELETE, FAQ_LIST, FAQ_UPDATE } from 'services/FAQServices';
+import { FAQ_CREATE, FAQ_DELETE, FAQ_LIST, FAQ_UPDATE } from '@/services/ShopServices';
 import Group, { ChildrenData, RootGroupsData } from '@/types/Group';
 import ListGroup from '../components/ListGroups';
 import ModalConfirm from '@/components/partials/ModalConfirm';

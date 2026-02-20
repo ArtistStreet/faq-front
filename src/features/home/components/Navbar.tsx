@@ -1,11 +1,15 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@apollo/client/react";
+import { PROFILE } from "@/services/UserService";
+import User, { MeResponse } from "@/types/User";
 
 export default function Navbar() {
      const navigate = useNavigate();
-     const { user, isAuthenticated, logout } = useAuth();
-     console.log("Navbar render, user:", user, "isAuthenticated:", isAuthenticated);
+     const { isAuthenticated, logout } = useAuth();
+     const { data } = useQuery<MeResponse>(PROFILE);
+     // console.log("user data: ", data);
      const handleLogout = () => {
           logout();
           navigate("/login");
@@ -17,9 +21,11 @@ export default function Navbar() {
 
                {isAuthenticated ? (
                     <>
-                         <span>Xin chào, {user?.name}</span>
+                         <span>Xin chào, {data?.me.name}</span>
                          <Link to="/profile">Profile</Link>
-                         <Link to="/shop/create">Tạo shop</Link>
+                         {data?.me.shop ? <Link to="/shop">Shop {data?.me.shop.name}</Link>
+                              : <Link to="/shop/create">Tạo shop</Link>
+                         }
                          <button onClick={handleLogout}>Đăng xuất</button>
                     </>
                ) : (
@@ -27,7 +33,8 @@ export default function Navbar() {
                          <Link to="/login">Login</Link>
                          <Link to="/register">Register</Link>
                     </>
-               )}
-          </nav>
+               )
+               }
+          </nav >
      );
 }
